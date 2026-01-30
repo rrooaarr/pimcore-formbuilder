@@ -13,6 +13,7 @@
 
 namespace FormBuilderBundle\Tool;
 
+use Doctrine\DBAL\Connection;
 use FormBuilderBundle\Migrations\Version20240916132702;
 use Pimcore\Extension\Bundle\Installer\Exception\InstallationException;
 use Pimcore\Extension\Bundle\Installer\SettingsStoreAwareInstaller;
@@ -21,12 +22,20 @@ use Pimcore\Model\Document\DocType;
 use Pimcore\Model\Translation;
 use Pimcore\Model\User\Permission;
 use Pimcore\Tool\Admin;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class Install extends SettingsStoreAwareInstaller
 {
     protected array $permissionsToInstall = [
         'formbuilder_permission_settings'
     ];
+
+    public function __construct(
+        BundleInterface $bundle,
+        private readonly Connection $db
+    ) {
+        parent::__construct($bundle);
+    }
 
     public function install(): void
     {
@@ -72,8 +81,7 @@ class Install extends SettingsStoreAwareInstaller
 
     protected function installDbStructure(): void
     {
-        $db = \Pimcore\Db::get();
-        $db->executeQuery(file_get_contents($this->getInstallSourcesPath() . '/sql/install.sql'));
+        $this->db->executeStatement(file_get_contents($this->getInstallSourcesPath() . '/sql/install.sql'));
     }
 
     /**
@@ -155,7 +163,7 @@ class Install extends SettingsStoreAwareInstaller
                 'type'       => 'email',
                 'priority'   => 0
             ]);
-            $type->getDao()->save();
+            $type->save();
         } catch (\Exception $e) {
             throw new InstallationException(sprintf('Failed to create document type "%s". Error was: "%s"', $elementName, $e->getMessage()));
         }

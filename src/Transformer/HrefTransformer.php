@@ -17,7 +17,7 @@ use Pimcore\Model\Element\Service;
 
 class HrefTransformer implements OptionsTransformerInterface
 {
-    public function transform(mixed $values, $optionConfig = null): array
+    public function transform(mixed $values, ?array $optionConfig = null): array
     {
         $transformedValues = [];
         foreach ($values as $locale => $value) {
@@ -30,7 +30,7 @@ class HrefTransformer implements OptionsTransformerInterface
         return $transformedValues;
     }
 
-    public function reverseTransform(mixed $values, $optionConfig = null): array
+    public function reverseTransform(mixed $values, ?array $optionConfig = null): array
     {
         $optionValues = [];
         foreach ($values as $locale => $value) {

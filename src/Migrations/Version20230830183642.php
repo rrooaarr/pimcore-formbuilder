@@ -19,13 +19,9 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\ORM\EntityRepository;
 use FormBuilderBundle\Model\OutputWorkflowChannel;
-use Pimcore\Bundle\CoreBundle\DependencyInjection\ContainerAwareInterface;
-use Pimcore\Bundle\CoreBundle\DependencyInjection\ContainerAwareTrait;
 
-final class Version20230830183642 extends AbstractMigration implements ContainerAwareInterface
+final class Version20230830183642 extends AbstractMigration
 {
-    use ContainerAwareTrait;
-
     public function doesSqlMigrations(): bool
     {
         return false;
@@ -39,7 +35,7 @@ final class Version20230830183642 extends AbstractMigration implements Container
     public function up(Schema $schema): void
     {
         // migrate mailLayoutData
-        $em = $this->container->get('doctrine.orm.entity_manager');
+        $em = \Pimcore::getContainer()->get('doctrine.orm.entity_manager');
 
         /** @var EntityRepository $repository */
         $repository = $em->getRepository(OutputWorkflowChannel::class);

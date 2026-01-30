@@ -13,6 +13,7 @@
 
 namespace FormBuilderBundle\Form\Admin\Type\OutputWorkflow\Component;
 
+use Pimcore\Localization\LocaleServiceInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,6 +22,12 @@ use Symfony\Component\Validator\Constraints\Valid;
 class LocalizedValuesCollectionType extends AbstractType
 {
     protected string $defaultLocaleCode = 'default';
+    private array $websiteLocales;
+
+    public function __construct(LocaleServiceInterface $localeService)
+    {
+        $this->websiteLocales = $localeService->getLocaleList();
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -36,7 +43,7 @@ class LocalizedValuesCollectionType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $websiteLocales = \Pimcore\Tool::getValidLanguages();
+        $websiteLocales = $this->websiteLocales;
 
         $resolver->setDefaults([
             'entries'     => array_merge(['default'], $websiteLocales),

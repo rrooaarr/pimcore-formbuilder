@@ -29,8 +29,8 @@ class FlashMessageExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('form_builder_get_flash_messages', [$this, 'getFlashMessagesForForm']),
-            new TwigFunction('form_builder_get_redirect_flash_messages', [$this, 'getFlashMessagesForRedirectForm'])
+            new TwigFunction('form_builder_get_flash_messages', $this->getFlashMessagesForForm(...)),
+            new TwigFunction('form_builder_get_redirect_flash_messages', $this->getFlashMessagesForRedirectForm(...))
         ];
     }
 

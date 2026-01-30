@@ -33,7 +33,7 @@ class StaticFormExtension extends AbstractExtension
         return [
             new TwigFunction(
                 'form_builder_static',
-                [$this, 'generateForm'],
+                $this->generateForm(...),
                 ['needs_environment' => true, 'needs_context' => true, 'is_safe' => ['html']]
             )
         ];

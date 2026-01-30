@@ -13,8 +13,18 @@
 
 namespace FormBuilderBundle\Tool;
 
+use Pimcore\Localization\LocaleServiceInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
 class LocaleDataMapper
 {
+    public function __construct(
+        private readonly LocaleServiceInterface $localeService,
+        #[Autowire('%pimcore.translations.default_locale%')]
+        private readonly ?string $defaultLocale = null
+    ) {
+    }
+
     public function mapHref(string $locale, array $data): mixed
     {
         // current locale found
@@ -23,7 +33,7 @@ class LocaleDataMapper
         }
 
         // search for fallback locale
-        $fallbackLanguages = \Pimcore\Tool::getFallbackLanguagesFor($locale);
+        $fallbackLanguages = $this->localeService->getFallbackLanguages($locale);
         foreach ($fallbackLanguages as $fallbackLanguage) {
             if (isset($data[$fallbackLanguage]) && !empty($data[$fallbackLanguage]['id'])) {
                 return $data[$fallbackLanguage]['id'];
@@ -31,9 +41,8 @@ class LocaleDataMapper
         }
 
         // search for default locale
-        $defaultLocale = \Pimcore\Tool::getDefaultLanguage();
-        if (isset($data[$defaultLocale]) && !empty($data[$defaultLocale]['id'])) {
-            return $data[$defaultLocale]['id'];
+        if ($this->defaultLocale !== null && isset($data[$this->defaultLocale]) && !empty($data[$this->defaultLocale]['id'])) {
+            return $data[$this->defaultLocale]['id'];
         }
 
         //no locale found. use the first one.
@@ -57,7 +66,7 @@ class LocaleDataMapper
         }
 
         // search for fallback locale
-        $fallbackLanguages = \Pimcore\Tool::getFallbackLanguagesFor($requestedLocale);
+        $fallbackLanguages = $this->localeService->getFallbackLanguages($requestedLocale);
         foreach ($fallbackLanguages as $fallbackLanguage) {
             if ($blockGenerator($fallbackLanguage) === true) {
                 return $data[$fallbackLanguage];
@@ -65,9 +74,8 @@ class LocaleDataMapper
         }
 
         // search for default locale
-        $defaultLocale = \Pimcore\Tool::getDefaultLanguage();
-        if ($blockGenerator($defaultLocale) === true) {
-            return $data[$defaultLocale];
+        if ($this->defaultLocale !== null && $blockGenerator($this->defaultLocale) === true) {
+            return $data[$this->defaultLocale];
         }
 
         //no locale found. use the first one.

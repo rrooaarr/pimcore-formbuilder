@@ -18,13 +18,9 @@ namespace FormBuilderBundle\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use FormBuilderBundle\Tool\Install;
-use Pimcore\Bundle\CoreBundle\DependencyInjection\ContainerAwareInterface;
-use Pimcore\Bundle\CoreBundle\DependencyInjection\ContainerAwareTrait;
 
-final class Version20240916132702 extends AbstractMigration implements ContainerAwareInterface
+final class Version20240916132702 extends AbstractMigration
 {
-    use ContainerAwareTrait;
-
     public function getDescription(): string
     {
         return '';
@@ -32,7 +28,7 @@ final class Version20240916132702 extends AbstractMigration implements Container
 
     public function up(Schema $schema): void
     {
-        $installer = $this->container->get(Install::class);
+        $installer = \Pimcore::getContainer()->get(Install::class);
         $installer->updateTranslations();
 
         if (!$schema->hasTable('formbuilder_double_opt_in_session')) {

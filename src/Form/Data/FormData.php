@@ -67,7 +67,7 @@ class FormData implements FormDataInterface
         $this->data[$name] = $value;
     }
 
-    public function __set(string $name, mixed $value)
+    public function __set(string $name, mixed $value): void
     {
         $this->data[$name] = $value;
     }

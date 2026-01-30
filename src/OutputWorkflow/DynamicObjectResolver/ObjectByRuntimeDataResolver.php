@@ -66,7 +66,7 @@ class ObjectByRuntimeDataResolver implements DynamicObjectResolverInterface
         if (is_callable([$pathName, $getter])) {
             $listing = $pathName::$getter($dataObjectIdentifier);
             if ($listing instanceof DataObject\Listing) {
-                $objects = $listing->getObjects();
+                $objects = $listing->load();
                 if (count($objects) === 1) {
                     return $objects[0];
                 }

@@ -19,6 +19,7 @@ use FormBuilderBundle\Model\FormFieldDefinitionInterface;
 use FormBuilderBundle\Stream\AttachmentStreamInterface;
 use Pimcore\Model\Asset;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -27,7 +28,8 @@ class DynamicMultiFileTransformer implements OutputTransformerInterface
     public function __construct(
         protected RouterInterface $router,
         protected TranslatorInterface $translator,
-        protected AttachmentStreamInterface $attachmentStream
+        protected AttachmentStreamInterface $attachmentStream,
+        protected RequestStack $requestStack
     ) {
     }
 
@@ -57,7 +59,8 @@ class DynamicMultiFileTransformer implements OutputTransformerInterface
         $asset = $this->attachmentStream->createAttachmentAsset($attachmentData, $fieldDefinition->getName(), $rootFormData->getFormDefinition()->getName());
 
         if ($asset instanceof Asset) {
-            $hostUrl = \Pimcore\Tool::getHostUrl();
+            $request = $this->requestStack->getCurrentRequest();
+            $hostUrl = $request ? $request->getSchemeAndHttpHost() : '';
 
             if (isset($options['submit_as_admin_deep_link']) && $options['submit_as_admin_deep_link'] === true) {
                 return sprintf('%s%s?%s_%d_%s', $hostUrl, $this->router->generate('pimcore_admin_login_deeplink'), 'asset', $asset->getId(), $asset->getType());

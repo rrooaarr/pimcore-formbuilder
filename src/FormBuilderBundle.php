@@ -30,16 +30,21 @@ use FormBuilderBundle\DependencyInjection\CompilerPass\OutputWorkflowFunnelActio
 use FormBuilderBundle\DependencyInjection\CompilerPass\OutputWorkflowFunnelLayerPass;
 use FormBuilderBundle\DependencyInjection\CompilerPass\RuntimeDataProviderPass;
 use FormBuilderBundle\DependencyInjection\CompilerPass\StorageProviderPass;
+use FormBuilderBundle\Doctrine\Type\FormBuilderArrayType;
 use FormBuilderBundle\Doctrine\Type\FormBuilderFieldsType;
+use FormBuilderBundle\Doctrine\Type\FormBuilderObjectType;
 use FormBuilderBundle\Factory\FormDefinitionFactoryInterface;
 use FormBuilderBundle\Tool\Install;
 use Pimcore\Extension\Bundle\AbstractPimcoreBundle;
+use Pimcore\Extension\Bundle\PimcoreBundleAdminClassicInterface;
+use Pimcore\Extension\Bundle\Traits\BundleAdminClassicTrait;
 use Pimcore\Extension\Bundle\Traits\PackageVersionTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class FormBuilderBundle extends AbstractPimcoreBundle
+class FormBuilderBundle extends AbstractPimcoreBundle implements PimcoreBundleAdminClassicInterface
 {
     use PackageVersionTrait;
+    use BundleAdminClassicTrait;
 
     public const PACKAGE_NAME = 'dachcom-digital/formbuilder';
 
@@ -50,15 +55,21 @@ class FormBuilderBundle extends AbstractPimcoreBundle
 
     private function addDBALTypes(): void
     {
-        if (Type::hasType('form_builder_fields')) {
-            return;
+        if (!Type::hasType('form_builder_fields')) {
+            Type::addType('form_builder_fields', FormBuilderFieldsType::class);
+
+            /** @var FormBuilderFieldsType $formBuilderFieldsType */
+            $formBuilderFieldsType = Type::getType('form_builder_fields');
+            $formBuilderFieldsType->setFormDefinitionFactory($this->container->get(FormDefinitionFactoryInterface::class));
         }
 
-        Type::addType('form_builder_fields', FormBuilderFieldsType::class);
+        if (!Type::hasType('form_builder_object')) {
+            Type::addType('form_builder_object', FormBuilderObjectType::class);
+        }
 
-        /** @var FormBuilderFieldsType $formBuilderFieldsType */
-        $formBuilderFieldsType = Type::getType('form_builder_fields');
-        $formBuilderFieldsType->setFormDefinitionFactory($this->container->get(FormDefinitionFactoryInterface::class));
+        if (!Type::hasType('form_builder_array')) {
+            Type::addType('form_builder_array', FormBuilderArrayType::class);
+        }
     }
 
     public function build(ContainerBuilder $container): void
