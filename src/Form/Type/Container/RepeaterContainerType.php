@@ -38,7 +38,7 @@ class RepeaterContainerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
+            ->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($options) {
                 $formBuilderConfig = $options['formbuilder_configuration'];
                 $minEntries = $formBuilderConfig['min'] ?? 0;
 
